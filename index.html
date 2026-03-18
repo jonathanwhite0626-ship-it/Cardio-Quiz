@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2487.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font: 12.0px Helvetica; -webkit-text-stroke: 0px #000000}
+    span.s2 {font-kerning: none}
+    span.Apple-tab-span {white-space:pre}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1">&lt;title&gt;Cardiology Medication Quiz&lt;/title&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1">body {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-family: Arial;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin: 30px;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">h1 { margin-bottom: 5px; }</p>
+<p class="p2"><br></p>
+<p class="p1">select, input, button {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-size: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin: 5px;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">#progressBar {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>width: 400px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>height: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid #ccc;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin: 10px auto;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">#progressFill {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>width: 0%;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>background-color: #4caf50;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">table {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin: 20px auto;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border-collapse: collapse;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>width: 400px;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">td {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>border: 1px solid #ccc;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 8px;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">.correct { background-color: #c8f7c5; }</p>
+<p class="p1">.revealed { background-color: #f7d6d6; }</p>
+<p class="p2"><br></p>
+<p class="p1">#timer {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>font-weight: bold;</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;h1&gt;Cardiology Medication Quiz&lt;/h1&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;select id="categorySelect"&gt;&lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;h2 id="categoryTitle"&gt;&lt;/h2&gt;</p>
+<p class="p1">&lt;p id="mechanismText"&gt;&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="timer"&gt;Time: 120&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;input id="guessInput" placeholder="Type medication..." autofocus&gt;</p>
+<p class="p1">&lt;button onclick="giveUp()"&gt;Give Up&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;p&gt;Score: &lt;span id="score"&gt;0&lt;/span&gt; / &lt;span id="total"&gt;&lt;/span&gt;&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div id="progressBar"&gt;&lt;div id="progressFill"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;table id="answerTable"&gt;&lt;/table&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;p id="missed"&gt;&lt;/p&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== PASTE YOUR GENERATED quizData HERE =====</p>
+<p class="p1">const quizData = {</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Ace Inhibitors": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of ACE, Increases Angiotensin I and Renin, Decreases Angiotensin II",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["lisinopril"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"ARBs": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Blockade of Angiotensin II type 1 Receptor",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["valsartan","losartan"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Dihydropyridine Calcium Channel Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of L-Type Calcium channels in vascular smooth muscle",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["amlodipine","nifedipine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Nondihydropyridine Calcium Channel Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of L-Type Calcium channels in cardiac and vascular smooth muscle (mostly affects the heart)",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["verapamil","diltiazem"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Thiazide Diuretic": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of Na/Cl transporter in distal tubule",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["hydrochlorothiazide","metolazone"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Nitrates": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Increase cGMP, Decrease intracellular Ca+2, Venous and Arterial Dilation",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["sodium nitroprusside","nitroglycerin"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"HMG-CoA Reductase Inhibitor": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibits HMG-CoA Reductase in Cholesterol synthesis, Decreases LDL",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["atorvastatin"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective α1 Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Activation of Gq-GPCR pathway, Increases Vasocontriction",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["phenylephrine","midodrine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective α2 Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Activation of Gi-GPCR pathway, Reduces sympathetic outflow",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["clonidine","methyldopa","guanfacine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Mixed α/β Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Preferential activation to certain receptors, but still all active",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["norepinephrine","epinephrine","dopamine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective α1 Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of α1 receptors (useful in orthostatic hypotension)",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["prazosin","terazosin","doxazosin"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Non-Selective α Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Can be either irreversible or reversible, respectively",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["phenoxybenzamine","phentolamine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective β1 Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Activation of Gs pathway, increases heart rate",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["dobutamine"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective β2 Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Activation of Gs pathway, increases cAMP causing bronchodilation and uterine relaxation",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["albuterol","terbutaline"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Non-Selective β Agonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Activation of Gs pathway, β1=β2",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["isoproterenol"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Selective β1 Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Antagonism of β1 receptors",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["metoprolol","esmolol","atenolol"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Non-Selective β Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Antagonism of β1, β2 receptors",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["propranolol","nadolol","timolol"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Mixed α/β Blockers": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Used in Hypertensive Emergencies",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["labetalol","carvedilol"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Class 1A Antiarrhythmics": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Moderate blockade of fast Na+ Channels",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["quinidine","procainamide"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Class 1B Antiarrhythmics": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Weak blockade of fast Na+ Channels, use if MI leads to ventricular arrhythmia",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["lidocaine","phenytoin"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Class 1C Antiarrhythmics": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Strong Blockade of fast Na+ Channels",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["flecainide","propafenone"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Class III Antiarrhythmics": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of K+ channels",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["sotalol","ibutilide","dofetilide"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Other Antiarrhythmics": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of Na/K ATPase",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["digoxin"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Mineralocorticoid Receptor Antagonists": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Competitively blocks aldosterone receptors in the kidney's distal tubules, potassium sparing diuretic",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["spironolactone"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Loop Diuretic": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of Sodium-Potassium-Chloride cotransporter in the thick ascending limb of the loop of Henle",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["furosemide"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Neprilysin Inhibitors": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Blocks metalloproteinase that normally digests ANP/BNP, Increases ANP/BNP",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["sacubitril"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>"Phosphodiesterase-3 (PDE-3) Inhibitor": {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>mechanism: "Inhibition of cAMP degradation, Increases Contractility and Vasodilation",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>drugs: ["milrinone","cilostazol"]</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">}</p>
+<p class="p1">// ============================================</p>
+<p class="p2"><br></p>
+<p class="p1">let currentCategory, score, revealed, timer, timeLeft</p>
+<p class="p2"><br></p>
+<p class="p1">const select = document.getElementById("categorySelect")</p>
+<p class="p1">const table = document.getElementById("answerTable")</p>
+<p class="p2"><br></p>
+<p class="p1">Object.keys(quizData).forEach(cat =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let option = document.createElement("option")</p>
+<p class="p1"><span class="Apple-converted-space">    </span>option.value = cat</p>
+<p class="p1"><span class="Apple-converted-space">    </span>option.textContent = cat</p>
+<p class="p1"><span class="Apple-converted-space">    </span>select.appendChild(option)</p>
+<p class="p1">})</p>
+<p class="p2"><br></p>
+<p class="p1">select.addEventListener("change", loadCategory)</p>
+<p class="p1">loadCategory()</p>
+<p class="p2"><br></p>
+<p class="p1">function loadCategory() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>clearInterval(timer)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>currentCategory = select.value</p>
+<p class="p1"><span class="Apple-converted-space">    </span>score = 0</p>
+<p class="p1"><span class="Apple-converted-space">    </span>revealed = false</p>
+<p class="p1"><span class="Apple-converted-space">    </span>timeLeft = 120</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const data = quizData[currentCategory]</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("categoryTitle").textContent = currentCategory</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("mechanismText").textContent = data.mechanism</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("score").textContent = 0</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("total").textContent = data.drugs.length</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("missed").textContent = ""</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>table.innerHTML = ""</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>data.drugs.forEach(drug =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let row = table.insertRow()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let cell = row.insertCell()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cell.textContent = "------"</p>
+<p class="p1"><span class="Apple-converted-space">        </span>cell.dataset.answer = drug.toLowerCase()</p>
+<p class="p1"><span class="Apple-converted-space">    </span>})</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>updateProgress()</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>timer = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>timeLeft--</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById("timer").textContent = "Time: " + timeLeft</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(timeLeft &lt;= 0) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>clearInterval(timer)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>giveUp()</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}, 1000)</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== Utility functions =====</p>
+<p class="p1">function isCloseMatch(guess, answer) {</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (guess === answer) return true</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>guess = guess.replace(/[\s-]/g, "")</p>
+<p class="p1"><span class="Apple-converted-space">    </span>answer = answer.replace(/[\s-]/g, "")</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function levenshtein(a, b) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const matrix = Array.from({ length: a.length + 1 }, () =&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>Array(b.length + 1).fill(0)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (let i = 0; i &lt;= a.length; i++) matrix[i][0] = i</p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (let j = 0; j &lt;= b.length; j++) matrix[0][j] = j</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>for (let i = 1; i &lt;= a.length; i++) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>for (let j = 1; j &lt;= b.length; j++) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const cost = a[i - 1] === b[j - 1] ? 0 : 1</p>
+<p class="p1"><span class="Apple-converted-space">                </span>matrix[i][j] = Math.min(</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>matrix[i - 1][j] + 1,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>matrix[i][j - 1] + 1,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>matrix[i - 1][j - 1] + cost</p>
+<p class="p1"><span class="Apple-converted-space">                </span>)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>return matrix[a.length][b.length]</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>return levenshtein(guess, answer) &lt;= 2</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ===== Input handler =====</p>
+<p class="p1">document.getElementById("guessInput").addEventListener("input", function(){</p>
+<p class="p1">document.getElementById("guessInput").addEventListener("input", function(){</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(revealed) return</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let guess = this.value.toLowerCase().trim()</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>table.querySelectorAll("td").forEach(cell =&gt; {</p>
+<p class="p3"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s2">if (cell.textContent === "------" &amp;&amp; isCloseMatch(guess, cell.dataset.answer)</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span>) {</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span>cell.textContent = cell.dataset.answer</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span>cell.classList.add("correct")</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span>score++</span></p>
+<p class="p3"><span class="s2"><span class="Apple-tab-span">	</span>}</span></p>
+<p class="p4"><span class="s2"></span><br></p>
+<p class="p3"><span class="s2">})</span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("score").textContent = score</p>
+<p class="p1"><span class="Apple-converted-space">    </span>updateProgress()</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(score === quizData[currentCategory].drugs.length) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>clearInterval(timer)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>showMissed()</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>this.value = ""</p>
+<p class="p1">})</p>
+<p class="p2"><br></p>
+<p class="p1">function giveUp() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>revealed = true</p>
+<p class="p1"><span class="Apple-converted-space">    </span>clearInterval(timer)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>table.querySelectorAll("td").forEach(cell =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(cell.textContent === "------") {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cell.textContent = cell.dataset.answer</p>
+<p class="p1"><span class="Apple-converted-space">            </span>cell.classList.add("revealed")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>})</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>showMissed()</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function updateProgress() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let total = quizData[currentCategory].drugs.length</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let percent = (score / total) * 100</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("progressFill").style.width = percent + "%"</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function showMissed() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let missed = []</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>table.querySelectorAll("td").forEach(cell =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(!cell.classList.contains("correct")) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>missed.push(cell.dataset.answer)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>})</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(missed.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById("missed").textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Missed: " + missed.join(", ")</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById("missed").textContent =</p>
+<p class="p1"><span class="Apple-converted-space">            </span>"Perfect score!"</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
