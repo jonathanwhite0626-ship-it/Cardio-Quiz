@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardiology Medication Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --surface: #ffffff;
+    --border: #ddd8ce;
+    --text: #1a1814;
+    --muted: #7a7468;
+    --accent: #c0392b;
+    --correct: #1e8c45;
+    --correct-bg: #e8f7ee;
+    --revealed-bg: #fde8e8;
+    --revealed-text: #c0392b;
+    --input-focus: #2c3e7a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--text);
+    color: #f5f2ec;
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  header .subtitle {
+    font-size: 0.78rem;
+    color: #a8a49e;
+    margin-top: 5px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .scoreboard {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+
+  .stat { text-align: right; }
+
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: #f5f2ec;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    color: #a8a49e;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .divider {
+    width: 1px;
+    height: 36px;
+    background: #3a3630;
+  }
+
+  .timer-bar-wrap {
+    height: 4px;
+    background: #3a3630;
+  }
+
+  #timerBar {
+    height: 100%;
+    background: #2c3e7a;
+    width: 100%;
+    transition: width 1s linear, background 0.5s;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 40px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  #timerDisplay {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    min-width: 70px;
+  }
+
+  #timerDisplay.urgent { color: var(--accent); font-weight: 500; }
+
+  .btn {
+    padding: 7px 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--text);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .btn:hover { background: var(--text); color: var(--bg); }
+
+  .btn-danger { border-color: var(--accent); color: var(--accent); }
+  .btn-danger:hover { background: var(--accent); color: white; }
+
+  .progress-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 18px;
+    padding: 28px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.07); }
+
+  .card-header {
+    padding: 13px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .card-mechanism {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+    line-height: 1.45;
+  }
+
+  .card-body {
+    padding: 10px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .drug-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .drug-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--border);
+    width: 14px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .drug-input {
+    flex: 1;
+    padding: 5px 9px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.83rem;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .drug-input::placeholder { color: #ccc8c0; }
+
+  .drug-input:focus {
+    border-color: var(--input-focus);
+    background: #fff;
+  }
+
+  .drug-input.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+    color: var(--correct);
+    font-weight: 500;
+    pointer-events: none;
+  }
+
+  .drug-input.revealed {
+    background: var(--revealed-bg);
+    border-color: var(--revealed-text);
+    color: var(--revealed-text);
+    pointer-events: none;
+  }
+
+  .card-footer {
+    padding: 0 16px 12px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .pip {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .pip.correct { background: var(--correct); }
+  .pip.revealed { background: var(--revealed-text); }
+
+  #completionBanner {
+    display: none;
+    text-align: center;
+    padding: 18px;
+    background: var(--correct-bg);
+    border-top: 2px solid var(--correct);
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    color: var(--correct);
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 18px 20px; }
+    .grid { padding: 16px; gap: 12px; }
+    .controls { padding: 10px 16px; }
+    header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Cardiology Medication Quiz</h1>
+    <div class="subtitle">CLICK ANY BOX · TYPE THE DRUG · ENTER OR TAB TO MOVE ON</div>
+  </div>
+  <div class="scoreboard">
+    <div class="stat">
+      <div class="stat-value" id="scoreDisplay">0</div>
+      <div class="stat-label">Correct</div>
+    </div>
+    <div class="divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="totalDisplay">0</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+</header>
+
+<div class="timer-bar-wrap">
+  <div id="timerBar"></div>
+</div>
+
+<div class="controls">
+  <span id="timerDisplay">⏱ 5:00</span>
+  <button class="btn" onclick="resetQuiz()">Reset</button>
+  <button class="btn btn-danger" onclick="giveUp()">Give Up</button>
+  <span class="progress-text" id="progressText">0 / 0 drugs found</span>
+</div>
+
+<div id="completionBanner">🎉 Perfect Score! Every drug nailed.</div>
+
+<div class="grid" id="quizGrid"></div>
+
+<script>
+const quizData = {
+  "ACE Inhibitors": {
+    mechanism: "Inhibition of ACE — increases Angiotensin I & Renin, decreases Angiotensin II",
+    drugs: ["lisinopril"]
+  },
+  "ARBs": {
+    mechanism: "Blockade of Angiotensin II type 1 receptor",
+    drugs: ["valsartan", "losartan"]
+  },
+  "Dihydropyridine CCBs": {
+    mechanism: "Inhibition of L-type Ca²⁺ channels in vascular smooth muscle",
+    drugs: ["amlodipine", "nifedipine"]
+  },
+  "Nondihydropyridine CCBs": {
+    mechanism: "Inhibition of L-type Ca²⁺ channels in cardiac & vascular smooth muscle (mostly heart)",
+    drugs: ["verapamil", "diltiazem"]
+  },
+  "Thiazide Diuretics": {
+    mechanism: "Inhibition of Na⁺/Cl⁻ transporter in distal tubule",
+    drugs: ["hydrochlorothiazide", "metolazone"]
+  },
+  "Nitrates": {
+    mechanism: "↑ cGMP → ↓ intracellular Ca²⁺ → venous & arterial dilation",
+    drugs: ["sodium nitroprusside", "nitroglycerin"]
+  },
+  "HMG-CoA Reductase Inhibitors": {
+    mechanism: "Inhibits HMG-CoA reductase in cholesterol synthesis — decreases LDL",
+    drugs: ["atorvastatin"]
+  },
+  "Selective α₁ Agonists": {
+    mechanism: "Activation of Gq-GPCR pathway — increases vasoconstriction",
+    drugs: ["phenylephrine", "midodrine"]
+  },
+  "Selective α₂ Agonists": {
+    mechanism: "Activation of Gi-GPCR pathway — reduces sympathetic outflow",
+    drugs: ["clonidine", "methyldopa", "guanfacine"]
+  },
+  "Mixed α/β Agonists": {
+    mechanism: "Preferential activation of certain receptors, but all subtypes active",
+    drugs: ["norepinephrine", "epinephrine", "dopamine"]
+  },
+  "Selective α₁ Blockers": {
+    mechanism: "Inhibition of α₁ receptors — useful in hypertension & BPH",
+    drugs: ["prazosin", "terazosin", "doxazosin"]
+  },
+  "Non-Selective α Blockers": {
+    mechanism: "Irreversible (phenoxybenzamine) or reversible (phentolamine) α blockade",
+    drugs: ["phenoxybenzamine", "phentolamine"]
+  },
+  "Selective β₁ Agonists": {
+    mechanism: "Activation of Gs pathway — increases heart rate & contractility",
+    drugs: ["dobutamine"]
+  },
+  "Selective β₂ Agonists": {
+    mechanism: "Activation of Gs pathway — ↑ cAMP → bronchodilation & uterine relaxation",
+    drugs: ["albuterol", "terbutaline"]
+  },
+  "Non-Selective β Agonists": {
+    mechanism: "Activation of Gs pathway — β₁ = β₂",
+    drugs: ["isoproterenol"]
+  },
+  "Selective β₁ Blockers": {
+    mechanism: "Antagonism of β₁ receptors",
+    drugs: ["metoprolol", "esmolol", "atenolol"]
+  },
+  "Non-Selective β Blockers": {
+    mechanism: "Antagonism of β₁ & β₂ receptors",
+    drugs: ["propranolol", "nadolol", "timolol"]
+  },
+  "Mixed α/β Blockers": {
+    mechanism: "Combined α & β blockade — used in hypertensive emergencies",
+    drugs: ["labetalol", "carvedilol"]
+  },
+  "Class 1A Antiarrhythmics": {
+    mechanism: "Moderate blockade of fast Na⁺ channels",
+    drugs: ["quinidine", "procainamide"]
+  },
+  "Class 1B Antiarrhythmics": {
+    mechanism: "Weak blockade of fast Na⁺ channels — use in post-MI ventricular arrhythmia",
+    drugs: ["lidocaine", "phenytoin"]
+  },
+  "Class 1C Antiarrhythmics": {
+    mechanism: "Strong blockade of fast Na⁺ channels",
+    drugs: ["flecainide", "propafenone"]
+  },
+  "Class III Antiarrhythmics": {
+    mechanism: "Inhibition of K⁺ channels — prolongs action potential",
+    drugs: ["sotalol", "ibutilide", "dofetilide"]
+  },
+  "Other Antiarrhythmics": {
+    mechanism: "Inhibition of Na⁺/K⁺ ATPase — increases vagal tone",
+    drugs: ["digoxin"]
+  },
+  "Mineralocorticoid Receptor Antagonists": {
+    mechanism: "Competitively blocks aldosterone receptors in distal tubules — K⁺-sparing diuretic",
+    drugs: ["spironolactone"]
+  },
+  "Loop Diuretics": {
+    mechanism: "Inhibition of Na⁺-K⁺-2Cl⁻ cotransporter in thick ascending limb of loop of Henle",
+    drugs: ["furosemide"]
+  },
+  "Neprilysin Inhibitors": {
+    mechanism: "Blocks metalloproteinase that digests ANP/BNP — increases natriuretic peptides",
+    drugs: ["sacubitril"]
+  },
+  "PDE-3 Inhibitors": {
+    mechanism: "Inhibition of cAMP degradation — increases contractility & vasodilation",
+    drugs: ["milrinone", "cilostazol"]
+  }
+};
+
+const TOTAL_TIME = 300;
+let timeLeft = TOTAL_TIME;
+let totalDrugs = 0;
+let score = 0;
+let timerInterval = null;
+let quizOver = false;
+
+function buildGrid() {
+  const grid = document.getElementById("quizGrid");
+  grid.innerHTML = "";
+  score = 0;
+  totalDrugs = 0;
+
+  Object.entries(quizData).forEach(([category, data]) => {
+    totalDrugs += data.drugs.length;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const hdr = document.createElement("div");
+    hdr.className = "card-header";
+    hdr.innerHTML = `<div class="card-title">${category}</div><div class="card-mechanism">${data.mechanism}</div>`;
+    card.appendChild(hdr);
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+
+    data.drugs.forEach((drug, i) => {
+      const row = document.createElement("div");
+      row.className = "drug-row";
+
+      const idx = document.createElement("span");
+      idx.className = "drug-index";
+      idx.textContent = i + 1;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "drug-input";
+      input.placeholder = "type drug name…";
+      input.dataset.answer = drug.toLowerCase();
+      input.autocomplete = "off";
+      input.spellcheck = false;
+
+      input.addEventListener("input", () => handleInput(input));
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === "Tab") {
+          e.preventDefault();
+          focusNextInput(input);
+        }
+      });
+
+      row.appendChild(idx);
+      row.appendChild(input);
+      body.appendChild(row);
+    });
+
+    card.appendChild(body);
+
+    const footer = document.createElement("div");
+    footer.className = "card-footer";
+    data.drugs.forEach(() => {
+      const pip = document.createElement("div");
+      pip.className = "pip";
+      footer.appendChild(pip);
+    });
+    card.appendChild(footer);
+
+    grid.appendChild(card);
+  });
+
+  document.getElementById("totalDisplay").textContent = totalDrugs;
+  updateProgress();
+}
+
+function handleInput(input) {
+  if (quizOver || input.classList.contains("correct")) return;
+  const guess = input.value.toLowerCase().trim();
+  if (!guess) return;
+
+  if (isCloseMatch(guess, input.dataset.answer)) {
+    input.value = input.dataset.answer;
+    input.classList.add("correct");
+    score++;
+    updateScore();
+    updateCardPips(input);
+    setTimeout(() => focusNextInput(input), 80);
+    if (score === totalDrugs) endQuiz(true);
+  }
+}
+
+function focusNextInput(current) {
+  const all = [...document.querySelectorAll(".drug-input:not(.correct):not(.revealed)")];
+  if (!all.length) return;
+  const idx = all.indexOf(current);
+  (all[idx + 1] || all[0]).focus();
+}
+
+function updateCardPips(changedInput) {
+  const card = changedInput.closest(".card");
+  const inputs = card.querySelectorAll(".drug-input");
+  const pips = card.querySelectorAll(".pip");
+  inputs.forEach((inp, i) => {
+    pips[i].className = "pip" + (inp.classList.contains("correct") ? " correct" : inp.classList.contains("revealed") ? " revealed" : "");
+  });
+}
+
+function isCloseMatch(guess, answer) {
+  if (guess === answer) return true;
+  const g = guess.replace(/[\s-]/g, "");
+  const a = answer.replace(/[\s-]/g, "");
+  if (Math.abs(g.length - a.length) > 3) return false;
+  const dp = Array.from({length: g.length + 1}, (_, i) =>
+    Array.from({length: a.length + 1}, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+  );
+  for (let i = 1; i <= g.length; i++)
+    for (let j = 1; j <= a.length; j++)
+      dp[i][j] = g[i-1] === a[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[g.length][a.length] <= 2;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    renderTimer();
+    if (timeLeft <= 0) endQuiz(false);
+  }, 1000);
+}
+
+function renderTimer() {
+  const m = Math.floor(timeLeft / 60);
+  const s = String(timeLeft % 60).padStart(2, "0");
+  const el = document.getElementById("timerDisplay");
+  el.textContent = `⏱ ${m}:${s}`;
+  el.className = timeLeft <= 30 ? "urgent" : "";
+  document.getElementById("timerBar").style.width = (timeLeft / TOTAL_TIME * 100) + "%";
+  document.getElementById("timerBar").style.background =
+    timeLeft <= 30 ? "#c0392b" : timeLeft <= 90 ? "#e67e22" : "#2c3e7a";
+}
+
+function giveUp() {
+  endQuiz(false);
+}
+
+function endQuiz(perfect) {
+  quizOver = true;
+  clearInterval(timerInterval);
+  document.querySelectorAll(".drug-input:not(.correct)").forEach(input => {
+    input.value = input.dataset.answer;
+    input.classList.add("revealed");
+    updateCardPips(input);
+  });
+  if (perfect) document.getElementById("completionBanner").style.display = "block";
+}
+
+function resetQuiz() {
+  quizOver = false;
+  timeLeft = TOTAL_TIME;
+  clearInterval(timerInterval);
+  document.getElementById("completionBanner").style.display = "none";
+  buildGrid();
+  renderTimer();
+  startTimer();
+}
+
+function updateScore() {
+  document.getElementById("scoreDisplay").textContent = score;
+  updateProgress();
+}
+
+function updateProgress() {
+  document.getElementById("progressText").textContent = `${score} / ${totalDrugs} drugs found`;
+}
+
+buildGrid();
+renderTimer();
+startTimer();
+</script>
+</body>
+</html>
