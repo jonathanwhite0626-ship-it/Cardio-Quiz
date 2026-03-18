@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cardiology Medication Quiz</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    margin: 30px;
+}
+
+h1 { margin-bottom: 5px; }
+
+select, input, button {
+    padding: 10px;
+    font-size: 16px;
+    margin: 5px;
+}
+
+#progressBar {
+    width: 400px;
+    height: 20px;
+    border: 1px solid #ccc;
+    margin: 10px auto;
+}
+
+#progressFill {
+    height: 100%;
+    width: 0%;
+    background-color: #4caf50;
+}
+
+table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 400px;
+}
+
+td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.correct { background-color: #c8f7c5; }
+.revealed { background-color: #f7d6d6; }
+
+#timer {
+    font-weight: bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Cardiology Medication Quiz</h1>
+
+<select id="categorySelect"></select>
+
+<h2 id="categoryTitle"></h2>
+<p id="mechanismText"></p>
+
+<div id="timer">Time: 120</div>
+
+<input id="guessInput" placeholder="Type medication..." autofocus>
+<button onclick="giveUp()">Give Up</button>
+
+<p>Score: <span id="score">0</span> / <span id="total"></span></p>
+
+<div id="progressBar"><div id="progressFill"></div></div>
+
+<table id="answerTable"></table>
+
+<p id="missed"></p>
+
+<script>
+
+const quizData = {
+  "Ace Inhibitors": {
+    mechanism: "Inhibition of ACE, Increases Angiotensin I and Renin, Decreases Angiotensin II",
+    drugs: ["lisinopril"]
+  },
+  "ARBs": {
+    mechanism: "Blockade of Angiotensin II type 1 Receptor",
+    drugs: ["valsartan","losartan"]
+  },
+  "Dihydropyridine Calcium Channel Blockers": {
+    mechanism: "Inhibition of L-Type Calcium channels in vascular smooth muscle",
+    drugs: ["amlodipine","nifedipine"]
+  },
+  "Nondihydropyridine Calcium Channel Blockers": {
+    mechanism: "Inhibition of L-Type Calcium channels in cardiac and vascular smooth muscle (mostly affects the heart)",
+    drugs: ["verapamil","diltiazem"]
+  },
+  "Thiazide Diuretic": {
+    mechanism: "Inhibition of Na/Cl transporter in distal tubule",
+    drugs: ["hydrochlorothiazide","metolazone"]
+  },
+  "Nitrates": {
+    mechanism: "Increase cGMP, Decrease intracellular Ca+2, Venous and Arterial Dilation",
+    drugs: ["sodium nitroprusside","nitroglycerin"]
+  },
+  "HMG-CoA Reductase Inhibitor": {
+    mechanism: "Inhibits HMG-CoA Reductase in Cholesterol synthesis, Decreases LDL",
+    drugs: ["atorvastatin"]
+  },
+  "Selective α1 Agonists": {
+    mechanism: "Activation of Gq-GPCR pathway, Increases Vasocontriction",
+    drugs: ["phenylephrine","midodrine"]
+  },
+  "Selective α2 Agonists": {
+    mechanism: "Activation of Gi-GPCR pathway, Reduces sympathetic outflow",
+    drugs: ["clonidine","methyldopa","guanfacine"]
+  },
+  "Mixed α/β Agonists": {
+    mechanism: "Preferential activation to certain receptors, but still all active",
+    drugs: ["norepinephrine","epinephrine","dopamine"]
+  },
+  "Selective α1 Blockers": {
+    mechanism: "Inhibition of α1 receptors (useful in orthostatic hypotension)",
+    drugs: ["prazosin","terazosin","doxazosin"]
+  },
+  "Non-Selective α Blockers": {
+    mechanism: "Can be either irreversible or reversible, respectively",
+    drugs: ["phenoxybenzamine","phentolamine"]
+  },
+  "Selective β1 Agonists": {
+    mechanism: "Activation of Gs pathway, increases heart rate",
+    drugs: ["dobutamine"]
+  },
+  "Selective β2 Agonists": {
+    mechanism: "Activation of Gs pathway, increases cAMP causing bronchodilation and uterine relaxation",
+    drugs: ["albuterol","terbutaline"]
+  },
+  "Non-Selective β Agonists": {
+    mechanism: "Activation of Gs pathway, β1=β2",
+    drugs: ["isoproterenol"]
+  },
+  "Selective β1 Blockers": {
+    mechanism: "Antagonism of β1 receptors",
+    drugs: ["metoprolol","esmolol","atenolol"]
+  },
+  "Non-Selective β Blockers": {
+    mechanism: "Antagonism of β1, β2 receptors",
+    drugs: ["propranolol","nadolol","timolol"]
+  },
+  "Mixed α/β Blockers": {
+    mechanism: "Used in Hypertensive Emergencies",
+    drugs: ["labetalol","carvedilol"]
+  },
+  "Class 1A Antiarrhythmics": {
+    mechanism: "Moderate blockade of fast Na+ Channels",
+    drugs: ["quinidine","procainamide"]
+  },
+  "Class 1B Antiarrhythmics": {
+    mechanism: "Weak blockade of fast Na+ Channels, use if MI leads to ventricular arrhythmia",
+    drugs: ["lidocaine","phenytoin"]
+  },
+  "Class 1C Antiarrhythmics": {
+    mechanism: "Strong Blockade of fast Na+ Channels",
+    drugs: ["flecainide","propafenone"]
+  },
+  "Class III Antiarrhythmics": {
+    mechanism: "Inhibition of K+ channels",
+    drugs: ["sotalol","ibutilide","dofetilide"]
+  },
+  "Other Antiarrhythmics": {
+    mechanism: "Inhibition of Na/K ATPase",
+    drugs: ["digoxin"]
+  },
+  "Mineralocorticoid Receptor Antagonists": {
+    mechanism: "Competitively blocks aldosterone receptors in the kidney's distal tubules, potassium sparing diuretic",
+    drugs: ["spironolactone"]
+  },
+  "Loop Diuretic": {
+    mechanism: "Inhibition of Sodium-Potassium-Chloride cotransporter in the thick ascending limb of the loop of Henle",
+    drugs: ["furosemide"]
+  },
+  "Neprilysin Inhibitors": {
+    mechanism: "Blocks metalloproteinase that normally digests ANP/BNP, Increases ANP/BNP",
+    drugs: ["sacubitril"]
+  },
+  "Phosphodiesterase-3 (PDE-3) Inhibitor": {
+    mechanism: "Inhibition of cAMP degradation, Increases Contractility and Vasodilation",
+    drugs: ["milrinone","cilostazol"]
+  }
+}
+
+let currentCategory, score, revealed, timer, timeLeft
+
+const select = document.getElementById("categorySelect")
+const table = document.getElementById("answerTable")
+
+Object.keys(quizData).forEach(cat => {
+    let option = document.createElement("option")
+    option.value = cat
+    option.textContent = cat
+    select.appendChild(option)
+})
+
+select.addEventListener("change", loadCategory)
+loadCategory()
+
+function loadCategory() {
+    clearInterval(timer)
+
+    currentCategory = select.value
+    score = 0
+    revealed = false
+    timeLeft = 120
+
+    const data = quizData[currentCategory]
+
+    document.getElementById("categoryTitle").textContent = currentCategory
+    document.getElementById("mechanismText").textContent = data.mechanism
+    document.getElementById("score").textContent = 0
+    document.getElementById("total").textContent = data.drugs.length
+    document.getElementById("missed").textContent = ""
+
+    table.innerHTML = ""
+
+    data.drugs.forEach(drug => {
+        let row = table.insertRow()
+        let cell = row.insertCell()
+        cell.textContent = "------"
+        cell.dataset.answer = drug.toLowerCase()
+    })
+
+    updateProgress()
+
+    timer = setInterval(() => {
+        timeLeft--
+        document.getElementById("timer").textContent = "Time: " + timeLeft
+
+        if(timeLeft <= 0) {
+            clearInterval(timer)
+            giveUp()
+        }
+    }, 1000)
+}
+
+// ===== Utility functions =====
+function isCloseMatch(guess, answer) {
+
+    if (guess === answer) return true
+
+    guess = guess.replace(/[\s-]/g, "")
+    answer = answer.replace(/[\s-]/g, "")
+
+    function levenshtein(a, b) {
+        const matrix = Array.from({ length: a.length + 1 }, () =>
+            Array(b.length + 1).fill(0)
+        )
+
+        for (let i = 0; i <= a.length; i++) matrix[i][0] = i
+        for (let j = 0; j <= b.length; j++) matrix[0][j] = j
+
+        for (let i = 1; i <= a.length; i++) {
+            for (let j = 1; j <= b.length; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                )
+            }
+        }
+
+        return matrix[a.length][b.length]
+    }
+
+    return levenshtein(guess, answer) <= 2
+}
+
+// ===== Input handler =====
+document.getElementById("guessInput").addEventListener("input", function(){
+
+    if(revealed) return
+
+    let guess = this.value.toLowerCase().trim()
+
+    table.querySelectorAll("td").forEach(cell => {
+        if (cell.textContent === "------" && isCloseMatch(guess, cell.dataset.answer)) {
+            cell.textContent = cell.dataset.answer
+            cell.classList.add("correct")
+            score++
+        }
+    })
+
+    document.getElementById("score").textContent = score
+    updateProgress()
+
+    if(score === quizData[currentCategory].drugs.length) {
+        clearInterval(timer)
+        showMissed()
+    }
+
+    this.value = ""
+})
+
+function giveUp() {
+    revealed = true
+    clearInterval(timer)
+
+    table.querySelectorAll("td").forEach(cell => {
+        if(cell.textContent === "------") {
+            cell.textContent = cell.dataset.answer
+            cell.classList.add("revealed")
+        }
+    })
+
+    showMissed()
+}
+
+function updateProgress() {
+    let total = quizData[currentCategory].drugs.length
+    let percent = (score / total) * 100
+    document.getElementById("progressFill").style.width = percent + "%"
+}
+
+function showMissed() {
+    let missed = []
+
+    table.querySelectorAll("td").forEach(cell => {
+        if(!cell.classList.contains("correct")) {
+            missed.push(cell.dataset.answer)
+        }
+    })
+
+    if(missed.length > 0) {
+        document.getElementById("missed").textContent =
+            "Missed: " + missed.join(", ")
+    } else {
+        document.getElementById("missed").textContent =
+            "Perfect score!"
+    }
+}
+
+</script>
+
+</body>
+</html>
